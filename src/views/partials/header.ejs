@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title || election?.title || "Election System MVC 1/69" %></title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <div>
+      <h1><%= election?.title || "Election System" %></h1>
+    </div>
+    <% if (role === "OFFICER") { %>
+      <nav>
+        <a href="/officer">หน้าหลัก</a>
+        <a href="/review">ตรวจสอบบัตรลงคะแนน</a>
+        <a href="/officer/result">สรุปผล</a>
+        <a href="/">เปลี่ยนสิทธิ์ผู้ใช้งาน</a>
+      </nav>
+    <% } else if (role === "VOTER") { %>
+      <nav>
+        <a href="/voter">ลงคะแนน</a>
+        <a href="/voter/result">สรุปผลคะแนน</a>
+        <a href="/">เปลี่ยนสิทธิ์ผู้ใช้งาน</a>
+      </nav>
+    <% } else { %>
+      <nav><a href="/">เลือกสิทธิ์ผู้ใช้งาน</a></nav>
+    <% } %>
+  </div>
+</header>
+<main class="container">

@@ -1,0 +1,24 @@
+<%- include("partials/header", { title: "เลือกโหมดการใช้งาน", election, role: "HOME" }) %>
+
+<section class="hero card">
+  <div class="eyebrow dark">Election System</div>
+  <h2>เลือกสิทธิ์ผู้ใช้งาน</h2>
+</section>
+
+<section class="role-grid">
+  <a class="role-card" href="/officer">
+    <div class="role-icon">O</div>
+    <h2>เจ้าหน้าที่</h2>
+    <p>ดูสถานะการเลือกตั้ง ปิดรับคะแนน ตรวจสอบบัตรและสรุปผล</p>
+    <span class="role-link">เข้าสู่หน้าจอเจ้าหน้าที่ →</span>
+  </a>
+
+  <a class="role-card" href="/voter">
+    <div class="role-icon">V</div>
+    <h2>ผู้ลงคะแนน</h2>
+    <p>ดูรายชื่อผู้สมัคร ลงคะแนน และดูสรุปสถานะและผลการลงคะแนน</p>
+    <span class="role-link">เข้าสู่หน้าจอผู้ลงคะแนน →</span>
+  </a>
+</section>
+
+<%- include("partials/footer") %>

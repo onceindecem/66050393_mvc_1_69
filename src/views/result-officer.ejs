@@ -1,0 +1,57 @@
+<%- include("partials/header", { title: "สรุปผลการเลือกตั้ง - เจ้าหน้าที่", election, role: "OFFICER" }) %>
+
+<section class="page-heading">
+  <div>
+    <div class="eyebrow dark">Officer Mode</div>
+    <h2>สรุปผลการเลือกตั้ง</h2>
+  </div>
+  <span class="badge <%= election.status.toLowerCase() %>"><%= election.status %></span>
+</section>
+
+<% if (election.status === "OPEN") { %>
+  <section class="card">
+    <h3>ยังไม่สามารถสรุปผลได้</h3>
+    <p class="muted">ต้องปิดรับคะแนนก่อนจึงจะแสดงผลการนับคะแนน</p>
+  </section>
+<% } else { %>
+  <section class="stats-grid">
+    <div class="card stat-card"><span class="muted">บัตรที่รับทั้งหมด</span><strong><%= counts.total %></strong></div>
+    <div class="card stat-card"><span class="muted">บัตรที่รับรอง/นับคะแนน</span><strong><%= counts.certified %></strong></div>
+    <div class="card stat-card"><span class="muted">บัตรที่รอการตรวจสอบ</span><strong><%= counts.pending %></strong></div>
+    <div class="card stat-card"><span class="muted">บัตรที่ไม่นับ</span><strong><%= counts.notCount %></strong></div>
+  </section>
+
+  <section class="card">
+    <div class="row between">
+      <div>
+        <h3><%= election.status === "FINALIZED" ? "ผลสรุปการเลือกตั้ง" : "ผลคะแนนชั่วคราว" %></h3>
+        <p class="muted">เรียงอันดับตามคะแนนจากมากไปน้อย</p>
+      </div>
+      <% if (election.status === "FINALIZED") { %>
+        <span class="badge finalized">สรุปผลแล้ว</span>
+      <% } %>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>อันดับ</th><th>ผู้สมัคร</th><th>คะแนน</th></tr>
+      </thead>
+      <tbody>
+        <% scores.forEach((item, index) => { %>
+          <tr>
+            <td><strong><%= index + 1 %></strong></td>
+            <td><%= item.candidate.id %> - <%= item.candidate.name %></td>
+            <td><strong><%= item.score %></strong></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </section>
+<% } %>
+
+<div class="actions">
+  <a class="button secondary" href="/officer">กลับหน้าหลัก</a>
+  <a class="button secondary" href="/review">ไปหน้าตรวจสอบบัตรลงคะแนน</a>
+</div>
+
+<%- include("partials/footer") %>

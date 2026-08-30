@@ -1,0 +1,110 @@
+<%- include("partials/header", { title: "หน้าผู้ลงคะแนน", election, role: "VOTER" }) %>
+
+<section class="page-heading">
+  <div>
+    <div class="eyebrow dark">Voter Mode</div>
+    <h2>สำหรับผู้ลงคะแนน</h2>
+  </div>
+  <span class="badge <%= election.status.toLowerCase() %>"><%= election.status %></span>
+</section>
+
+<% if (success) { %>
+  <div class="alert success"><%= success %></div>
+<% } %>
+<% if (error) { %>
+  <div class="alert error"><%= error %></div>
+<% } %>
+
+<section class="card">
+  <div class="section-title">
+    <div>
+      <h3>เลือกผู้มีสิทธิ์</h3>
+      <p class="muted">เลือกชื่อผู้มีสิทธิ์เพื่อเปิดแบบฟอร์มลงคะแนน</p>
+    </div>
+  </div>
+
+  <div class="voter-grid">
+    <% voters.forEach(voter => { %>
+      <a class="voter-card <%= selectedVoter?.id === voter.id ? "selected" : "" %>" href="/voter?voterId=<%= voter.id %>">
+        <div class="row between">
+          <strong><%= voter.id %></strong>
+          <% if (voter.hasVoted) { %>
+            <span class="badge not_count">ใช้สิทธิ์แล้ว</span>
+          <% } else if (!voter.active) { %>
+            <span class="badge closed">Inactive</span>
+          <% } else { %>
+            <span class="badge open">Active</span>
+          <% } %>
+        </div>
+        <span><%= voter.name %></span>
+      </a>
+    <% }) %>
+  </div>
+</section>
+
+<% if (selectedVoter) { %>
+<section class="card">
+  <div class="row between">
+    <div>
+      <h3>บัตรของ <%= selectedVoter.id %> - <%= selectedVoter.name %></h3>
+      <p class="muted">เลือกอันดับ 1, 2 และ 3 โดยห้ามเลือกผู้สมัครซ้ำกัน</p>
+    </div>
+    <% if (selectedVoter.hasVoted) { %>
+      <span class="badge not_count">ใช้สิทธิ์แล้ว</span>
+    <% } %>
+  </div>
+
+  <form method="post" action="/voter" class="form">
+    <input type="hidden" name="voterId" value="<%= selectedVoter.id %>">
+
+    <div class="grid-3">
+      <% for (let i = 1; i <= 3; i++) { %>
+        <label>อันดับ <%= i %>
+          <select name="rank<%= i %>" required <%= election.status !== "OPEN" || selectedVoter.hasVoted || !selectedVoter.active ? "disabled" : "" %>>
+            <option value="">-- ผู้สมัคร --</option>
+            <% candidates.forEach(candidate => { %>
+              <option value="<%= candidate.id %>"><%= candidate.id %> - <%= candidate.name %></option>
+            <% }) %>
+          </select>
+        </label>
+      <% } %>
+    </div>
+
+    <button type="submit" class="primary" <%= election.status !== "OPEN" || selectedVoter.hasVoted || !selectedVoter.active ? "disabled" : "" %>>
+      ส่งบัตรเลือกตั้ง
+    </button>
+  </form>
+
+  <% if (election.status !== "OPEN") { %>
+    <div class="alert error">ขณะนี้ไม่อยู่ในสถานะ OPEN จึงไม่สามารถรับบัตรใหม่ได้</div>
+  <% } else if (selectedVoter.hasVoted) { %>
+    <div class="alert error">ผู้มีสิทธิ์นี้เคยลงคะแนนแล้ว จึงไม่สามารถลงคะแนนซ้ำได้</div>
+  <% } else if (!selectedVoter.active) { %>
+    <div class="alert error">ผู้มีสิทธิ์นี้ไม่อยู่ในสถานะ Active</div>
+  <% } %>
+</section>
+<% } %>
+
+<section class="card">
+  <h3>รายชื่อผู้สมัคร</h3>
+  <table>
+    <thead><tr><th>รหัส</th><th>ชื่อ</th></tr></thead>
+    <tbody>
+      <% candidates.forEach(candidate => { %>
+        <tr><td><%= candidate.id %></td><td><%= candidate.name %></td></tr>
+      <% }) %>
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <div class="row between">
+    <div>
+      <h3>สรุปผลการเลือกตั้ง</h3>
+      <p class="muted">ดูคะแนนและอันดับผู้สมัคร</p>
+    </div>
+    <a class="button secondary" href="/voter/result">ดูสรุปผล</a>
+  </div>
+</section>
+
+<%- include("partials/footer") %>

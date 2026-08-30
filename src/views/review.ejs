@@ -1,0 +1,63 @@
+<%- include("partials/header", { title: "ตรวจสอบกลุ่ม", election, role: "OFFICER" }) %>
+
+<section class="card">
+  <div class="row between">
+    <div>
+      <h2>ตรวจสอบกลุ่มบัตร</h2>
+    </div>
+    <span class="badge <%= election.status.toLowerCase() %>"><%= election.status %></span>
+  </div>
+
+  <% if (success) { %>
+    <div class="alert success"><%= success %></div>
+  <% } %>
+  <% if (error) { %>
+    <div class="alert error"><%= error %></div>
+  <% } %>
+
+  <% if (election.status === "OPEN") { %>
+    <p>ยังไม่ปิดรับคะแนน จึงยังไม่มีกลุ่มให้ตรวจสอบ</p>
+  <% } %>
+
+  <% if (groups.length === 0 && election.status !== "OPEN") { %>
+    <p>ไม่พบกลุ่มรูปแบบซ้ำ</p>
+  <% } %>
+
+  <% groups.forEach(group => { %>
+    <div class="card nested">
+      <div class="row between">
+        <div>
+          <h3><%= group.pattern %></h3>
+          <p>จำนวน <strong><%= group.count %></strong> บัตร</p>
+        </div>
+        <span class="badge <%= group.status.toLowerCase() %>"><%= group.status %></span>
+      </div>
+
+      <ul>
+        <% group.ballotIds.forEach(ballotId => { 
+             const ballot = getBallotById(ballotId);
+        %>
+          <li><%= ballot.id %> — Voter: <%= ballot.voterId %> — <%= ballot.ranking.join(" > ") %></li>
+        <% }) %>
+      </ul>
+
+      <% if (group.status === "PENDING_REVIEW" && election.status !== "FINALIZED") { %>
+        <div class="actions">
+          <form method="post" action="/review">
+            <input type="hidden" name="groupId" value="<%= group.id %>">
+            <input type="hidden" name="decision" value="CERTIFY">
+            <button class="primary" type="submit">รับรอง / นับคะแนน</button>
+          </form>
+
+          <form method="post" action="/review">
+            <input type="hidden" name="groupId" value="<%= group.id %>">
+            <input type="hidden" name="decision" value="NOT_COUNT">
+            <button class="secondary" type="submit">ไม่นับ</button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+  <% }) %>
+</section>
+
+<%- include("partials/footer") %>

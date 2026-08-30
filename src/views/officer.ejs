@@ -1,0 +1,93 @@
+<%- include("partials/header", { title: "หน้าสำหรับเจ้าหน้าที่", election, role: "OFFICER" }) %>
+
+<section class="page-heading">
+  <div>
+    <div class="eyebrow dark">Officer Mode</div>
+    <h2>สำหรับเจ้าหน้าที่</h2>
+  </div>
+  <span class="badge <%= election.status.toLowerCase() %>"><%= election.status %></span>
+</section>
+
+<% if (success) { %>
+  <div class="alert success"><%= success %></div>
+<% } %>
+<% if (error) { %>
+  <div class="alert error"><%= error %></div>
+<% } %>
+
+<section class="stats-grid">
+  <div class="card stat-card">
+    <span class="muted">สถานะ</span>
+    <strong><%= election.status %></strong>
+  </div>
+  <div class="card stat-card">
+    <span class="muted">บัตรที่รับทั้งหมด</span>
+    <strong><%= election.getBallotCount() %></strong>
+  </div>
+  <div class="card stat-card">
+    <span class="muted">บัตรที่รับรอง/นับคะแนน</span>
+    <strong><%= election.status === "OPEN" ? 0 : election.ballots.filter(b => b.status === "CERTIFIED").length %></strong>
+  </div>
+  <div class="card stat-card">
+    <span class="muted">บัตรที่รอการตรวจสอบ</span>
+    <strong><%= election.ballots.filter(b => b.status === "PENDING_REVIEW").length %></strong>
+  </div>
+  <div class="card stat-card">
+    <span class="muted">บัตรที่ไม่นับ</span>
+    <strong><%= election.ballots.filter(b => b.status === "NOT_COUNT").length %></strong>
+  </div>
+  <div class="card stat-card">
+    <span class="muted">กลุ่มบัตรที่รอตรวจสอบ</span>
+    <strong><%= election.getPendingGroups().length %></strong>
+  </div>
+</section>
+
+<% if (election.status === "OPEN") { %>
+<section class="card action-card">
+  <div>
+    <h3>ปิดรับคะแนนและตรวจสอบรูปแบบบัตร</h3>
+  </div>
+  <form method="post" action="/officer/close">
+    <button class="danger" type="submit">ปิดรับคะแนน</button>
+  </form>
+</section>
+<% } %>
+
+<% if (election.status !== "OPEN") { %>
+<section class="card">
+  <div class="row between">
+    <div>
+      <h3>กลุ่มบัตรรอตรวจสอบ</h3>
+    </div>
+    <a class="button secondary" href="/review">ไปหน้าตรวจสอบบัตร</a>
+  </div>
+
+  <% const pending = election.groups.filter(g => g.status === "PENDING_REVIEW"); %>
+  <% if (pending.length === 0) { %>
+    <p>ไม่มีบัตรที่รอตรวจสอบ</p>
+  <% } else { %>
+    <div class="group-list">
+      <% pending.forEach(group => { %>
+        <div class="group">
+          <strong><%= group.pattern %></strong>
+          <span><%= group.count %> บัตร</span>
+          <span class="badge pending_review">PENDING_REVIEW</span>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<section class="card">
+  <div class="row between">
+    <div>
+      <h3>สรุปผลการเลือกตั้ง</h3>
+      <p class="muted">ดูคะแนนและอันดับผู้สมัคร</p>
+    </div>
+    <a class="button secondary" href="/officer/result">ดูสรุปผล</a>
+  </div>
+</section>
+
+<% } %>
+
+<%- include("partials/footer") %>

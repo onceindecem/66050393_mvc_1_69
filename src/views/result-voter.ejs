@@ -1,0 +1,54 @@
+<%- include("partials/header", { title: "สรุปผลการเลือกตั้ง - ผู้ลงคะแนน", election, role: "VOTER" }) %>
+
+<section class="page-heading">
+  <div>
+    <div class="eyebrow dark">Voter Mode</div>
+    <h2>สรุปผลการเลือกตั้ง</h2>
+    <p class="muted">ผลคะแนนที่คำนวณจากบัตรที่ได้รับการรับรอง/นับคะแนน</p>
+  </div>
+  <span class="badge <%= election.status.toLowerCase() %>"><%= election.status %></span>
+</section>
+
+<% if (election.status === "OPEN") { %>
+  <section class="card">
+    <h3>ยังไม่สามารถสรุปผลได้</h3>
+    <p class="muted">การเลือกตั้งยังเปิดรับคะแนนอยู่</p>
+  </section>
+<% } else { %>
+  <section class="card">
+    <div class="row between">
+      <div>
+        <h3><%= election.status === "FINALIZED" ? "ผลสรุปการเลือกตั้ง" : "ผลคะแนนปัจจุบัน" %></h3>
+      </div>
+      <% if (election.status === "FINALIZED") { %>
+        <span class="badge finalized">สรุปผลแล้ว</span>
+      <% } %>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>อันดับ</th><th>ผู้สมัคร</th><th>คะแนน</th></tr>
+      </thead>
+      <tbody>
+        <% scores.forEach((item, index) => { %>
+          <tr>
+            <td><strong><%= index + 1 %></strong></td>
+            <td><%= item.candidate.id %> - <%= item.candidate.name %></td>
+            <td><strong><%= item.score %></strong></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="stats-grid">
+    <div class="card stat-card"><span class="muted">บัตรที่รับทั้งหมด</span><strong><%= counts.total %></strong></div>
+    <div class="card stat-card"><span class="muted">บัตรที่รับรอง/นับคะแนน</span><strong><%= counts.certified %></strong></div>
+    <div class="card stat-card"><span class="muted">บัตรที่รอตรวจสอบ</span><strong><%= counts.pending %></strong></div>
+    <div class="card stat-card"><span class="muted">บัตรที่ไม่นับ</span><strong><%= counts.notCount %></strong></div>
+  </section>
+<% } %>
+
+<a class="button secondary" href="/voter">กลับหน้าหลักผู้ลงคะแนน</a>
+
+<%- include("partials/footer") %>
